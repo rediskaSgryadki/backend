@@ -1,19 +1,22 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .notisend import send_feedback_email
-from rest_framework.permissions import AllowAny
+from django.core.mail import send_mail
 
 class FeedbackView(APIView):
-    permission_classes = [AllowAny]
-
     def post(self, request):
-        email = request.data.get('email', '')
-        message = request.data.get('message', '')
-        if not message:
-            return Response({'error': 'Message is required.'}, status=status.HTTP_400_BAD_REQUEST)
-        success = send_feedback_email(email, message)
-        if success:
-            return Response({'success': True})
-        else:
-            return Response({'error': 'Failed to send email.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
+        name = request.data.get('name')
+        email = request.data.get('email')
+        message = request.data.get('message')
+        if not (name and email and message):
+            return Response({'error': 'Все поля обязательны'}, status=status.HTTP_400_BAD_REQUEST)
+        subject = f'Обратная связь от {name}'
+        body = f'Имя: {name}\nEmail: {email}\nСообщение:\n{message}'
+        send_mail(
+            subject,
+            body,
+            'rediskaSgryadki@yandex.ru',
+            ['rediskaSgryadki@yandex.ru'],
+            fail_silently=False,
+        )
+        return Response({'success': 'Сообщение отправлено!'}) 

@@ -4,10 +4,7 @@ import axios from 'axios';
 import './index.css';
 import App from './App';
 import { getToken, clearAuthData } from './utils/authUtils';
-<<<<<<< HEAD
-=======
 import ErrorBoundary from './ErrorBoundary';
->>>>>>> bef64e36bf9285af801b42d8bc68066061410006
 
 // Configure axios defaults
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
@@ -82,12 +79,8 @@ if (savedStandardTheme === 'dark') {
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-<<<<<<< HEAD
-      <App />
-=======
     <ErrorBoundary>
       <App />
     </ErrorBoundary>
->>>>>>> bef64e36bf9285af801b42d8bc68066061410006
   </React.StrictMode>
 );

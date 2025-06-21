@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .mailgun import send_feedback_email
+from .notisend import send_feedback_email
 from rest_framework.permissions import AllowAny
 
 class FeedbackView(APIView):

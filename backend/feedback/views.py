@@ -17,13 +17,14 @@ class FeedbackView(APIView):
             return Response({'error': 'Все поля обязательны'}, status=status.HTTP_400_BAD_REQUEST)
         subject = f'Обратная связь: {topic} — {name}'
         text_body = f'Имя: {name}\nEmail: {email}\nТема: {topic}\nСообщение:\n{message}'
+        msg_html = escape(message).replace('\n', '<br>')
         html_body = f'''
             <h2>Новое сообщение обратной связи</h2>
             <p><strong>Имя:</strong> {escape(name)}</p>
             <p><strong>Email:</strong> {escape(email)}</p>
             <p><strong>Тема:</strong> {escape(topic)}</p>
             <p><strong>Сообщение:</strong></p>
-            <div style="background:#f7f7f7;padding:10px;border-radius:8px;">{escape(message).replace('\n', '<br>')}</div>
+            <div style="background:#f7f7f7;padding:10px;border-radius:8px;">{msg_html}</div>
         '''
         email_message = EmailMultiAlternatives(
             subject,

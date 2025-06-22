@@ -17,6 +17,7 @@ class Entry(models.Model):
     date = models.DateField(null=True, blank=True)  # Дата записи
     hashtags = models.TextField(null=True, blank=True)  # Хэштеги через запятую
     is_public = models.BooleanField(default=False)  # Флаг публичности записи
+    emotion = models.CharField(max_length=10, null=True, blank=True) # Эмоция связанная с записью
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

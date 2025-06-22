@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from .models import Entry
 from .serializers import EntrySerializer
 from users.models import User  # Импортируем кастомную модель User
+from emotions.models import Emotion
 import logging
 import traceback
 from datetime import datetime
@@ -56,19 +57,39 @@ class EntryViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         try:
             # Проверяем, что пользователь существует в базе данных
-            user_id = self.request.user.id
-            logger.info(f"Creating entry for user: {self.request.user.username}, ID: {user_id}")
+            user = self.request.user
+            logger.info(f"Creating entry for user: {user.username}, ID: {user.id}")
+
+            emotion_type = serializer.validated_data.get('emotion')
             
-            try:
-                # Получаем объект пользователя напрямую из модели User
-                user = User.objects.get(id=user_id)
-                logger.info(f"Found user for create entry: {user.username}, ID: {user.id}")
-                serializer.save(user=user)
-            except User.DoesNotExist:
-                logger.error(f"User with ID {user_id} does not exist")
-                raise ValueError(f"User with ID {user_id} does not exist")
+            # Сохраняем запись
+            entry = serializer.save(user=user)
+
+            # Если есть эмоция, создаем запись в модели Emotion
+            if emotion_type:
+                Emotion.objects.create(user=user, emotion_type=emotion_type)
+                logger.info(f"Created emotion '{emotion_type}' for user {user.username}")
+
         except Exception as e:
             logger.error(f"Error in perform_create: {str(e)}")
+            logger.error(traceback.format_exc())
+            raise
+
+    def perform_update(self, serializer):
+        try:
+            user = self.request.user
+            emotion_type = serializer.validated_data.get('emotion')
+            
+            # Сохраняем обновленную запись
+            instance = serializer.save()
+
+            # Если эмоция была изменена, создаем новую запись в Emotion
+            if emotion_type and instance.emotion != emotion_type:
+                 Emotion.objects.create(user=user, emotion_type=emotion_type)
+                 logger.info(f"Created emotion '{emotion_type}' for user {user.username} during update")
+
+        except Exception as e:
+            logger.error(f"Error in perform_update: {str(e)}")
             logger.error(traceback.format_exc())
             raise
 

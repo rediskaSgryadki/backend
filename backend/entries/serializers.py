@@ -17,6 +17,7 @@ class EntrySerializer(serializers.ModelSerializer):
             'date', 'created_at', 'updated_at', 'hashtags', 'is_public',
             'author',
             'comments_count',
+            'emotion',
         ]
         read_only_fields = ['created_at', 'updated_at']
 

@@ -41,6 +41,14 @@ class EntrySerializer(serializers.ModelSerializer):
         return obj.comments.count()
 
     def create(self, validated_data):
+        # Manually handle location from initial data if it's flat
+        if 'location.latitude' in self.initial_data and 'location.longitude' in self.initial_data:
+            validated_data['location'] = {
+                'latitude': self.initial_data.get('location.latitude'),
+                'longitude': self.initial_data.get('location.longitude'),
+                'name': self.initial_data.get('location.name', '')
+            }
+        
         try:
             logger.debug(f"Entry create validated_data: {validated_data}")
             return Entry.objects.create(**validated_data)
@@ -49,6 +57,14 @@ class EntrySerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(f"Error creating entry: {str(e)}")
 
     def update(self, instance, validated_data):
+        # Manually handle location from initial data
+        if 'location.latitude' in self.initial_data and 'location.longitude' in self.initial_data:
+            validated_data['location'] = {
+                'latitude': self.initial_data.get('location.latitude'),
+                'longitude': self.initial_data.get('location.longitude'),
+                'name': self.initial_data.get('location.name', '')
+            }
+            
         cover_image = validated_data.pop('cover_image', None)
         if cover_image is not None:
             instance.cover_image = cover_image
